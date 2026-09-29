@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Create Campaign - My Ad Network</title>
+  <style>
+    body { font-family: Arial, sans-serif; background-color: #f4f7f6; margin: 0; }
+    .navbar { background-color: #007bff; color: white; padding: 15px 30px; }
+    .navbar h2 { margin: 0; }
+    .container { padding: 30px; max-width: 500px; margin: auto; }
+    .card { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+    input, select { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+    button { width: 100%; padding: 12px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+    button:hover { background-color: #218838; }
+    #message { text-align: center; margin-top: 15px; }
+    a { display: block; text-align: center; margin-top: 20px; color: #007bff; }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <h2>Create Campaign</h2>
+  </div>
+
+  <div class="container">
+    <div class="card">
+      <form id="campaignForm">
+        <label>Campaign Name</label>
+        <input type="text" id="campaignName" placeholder="e.g., Summer Sale 2024" required>
+
+        <label>Ad Image URL</label>
+        <input type="url" id="adImage" placeholder="https://example.com/banner.jpg" required>
+
+        <label>Target Link (Where the ad goes)</label>
+        <input type="url" id="targetLink" placeholder="https://yourwebsite.com" required>
+
+        <label>Budget ($)</label>
+        <input type="number" id="budget" placeholder="100" required>
+
+        <label>Category</label>
+        <select id="category">
+          <option value="technology">Technology</option>
+          <option value="fashion">Fashion</option>
+          <option value="gaming">Gaming</option>
+          <option value="food">Food</option>
+          <option value="business">Business</option>
+        </select>
+
+        <button type="submit">Launch Campaign</button>
+        <p id="message"></p>
+      </form>
+      <a href="dashboard.html">← Back to Dashboard</a>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    // PASTE YOUR FIREBASE CONFIG HERE
+    const firebaseConfig = {
+      apiKey: "PASTE_YOUR_API_KEY_HERE",
+      authDomain: "PASTE_YOUR_AUTH_DOMAIN_HERE",
+      projectId: "PASTE_YOUR_PROJECT_ID_HERE",
+      storageBucket: "PASTE_YOUR_STORAGE_BUCKET_HERE",
+      messagingSenderId: "PASTE_YOUR_SENDER_ID_HERE",
+      appId: "PASTE_YOUR_APP_ID_HERE"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app); // Initialize the database
+
+    let currentUser = null;
+
+    // Check if user is logged in
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        currentUser = user;
+      } else {
+        window.location.href = "login.html";
+      }
+    });
+
+    // Handle form submission
+    document.getElementById("campaignForm").addEventListener("submit", async function(e) {
+      e.preventDefault(); // Stop the page from refreshing
+      const message = document.getElementById("message");
+      message.style.color = "black";
+      message.textContent = "Saving campaign...";
+
+      // Get the values from the form
+      const name = document.getElementById("campaignName").value;
+      const image = document.getElementById("adImage").value;
+      const link = document.getElementById("targetLink").value;
+      const budget = document.getElementById("budget").value;
+      const category = document.getElementById("category").value;
+
+      try {
+        // Save to Firestore Database
+        await addDoc(collection(db, "campaigns"), {
+          userId: currentUser.uid,
+          userEmail: currentUser.email,
+          campaignName: name,
+          adImage: image,
+          targetLink: link,
+          budget: budget,
+          category: category,
+          status: "Pending Review",
+          createdAt: new Date()
+        });
+
+        message.style.color = "green";
+        message.textContent = "Campaign created successfully!";
+        
+        // Clear the form
+        document.getElementById("campaignForm").reset();
+
+        // Redirect back to dashboard after 1.5 seconds
+        setTimeout(() => {
+          window.location.href = "dashboard.html";
+        }, 1500);
+
+      } catch (error) {
+        message.style.color = "red";
+        message.textContent = "Error: " + error.message;
+      }
+    });
+  </script>
+</body>
+</html>
