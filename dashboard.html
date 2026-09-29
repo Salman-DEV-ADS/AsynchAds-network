@@ -53,13 +53,12 @@
       </a>
     </div>
 
-    <script type="module">
+      <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    // NEW IMPORTS ADDED BELOW:
     import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    // PASTE YOUR FIREBASE CONFIG HERE (Make sure your real keys are here!)
+    // PASTE YOUR FIREBASE CONFIG HERE
     const firebaseConfig = {
       apiKey: "AIzaSyALBt9hfwejVrpmAU2I2JY3h7puWT77tOo",
       authDomain: "asynchads-network.firebaseapp.com",
@@ -71,33 +70,30 @@
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
-    const db = getFirestore(app); // Initialize database
+    const db = getFirestore(app);
 
-    // Check if user is logged in
+    // THE BOUNCER: Check if user is logged in
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         document.getElementById("userEmail").textContent = user.email;
-        // NEW: Load campaigns when user logs in
         loadCampaigns(user.uid); 
       } else {
         window.location.href = "login.html";
       }
     });
 
-    // NEW FUNCTION TO FETCH CAMPAIGNS
+    // Load campaigns
     async function loadCampaigns(userId) {
       const list = document.getElementById("campaignList");
       try {
-        // Ask Firebase for campaigns where userId matches the logged-in user
         const q = query(collection(db, "campaigns"), where("userId", "==", userId));
         const querySnapshot = await getDocs(q);
         
-        list.innerHTML = ""; // Clear "Loading..." message
+        list.innerHTML = ""; 
         
         if (querySnapshot.empty) {
           list.innerHTML = "<p>No campaigns yet.</p>";
         } else {
-          // Loop through the campaigns and show them
           querySnapshot.forEach((doc) => {
             const data = doc.data();
             list.innerHTML += `
@@ -110,15 +106,14 @@
         }
       } catch (error) {
         console.error("Error loading campaigns: ", error);
-        list.innerHTML = "<p style='color:red;'>Error loading campaigns. Check console.</p>";
+        list.innerHTML = "<p style='color:red;'>Error loading campaigns.</p>";
       }
     }
 
-     document.getElementById("logoutBtn").addEventListener("click", function() {
+    // THE FIXED LOGOUT BUTTON
+    document.getElementById("logoutBtn").addEventListener("click", function() {
       signOut(auth).then(() => {
-        window.location.href = "login.html"; // FIXED: Sends you to login, not dashboard!
-      }).catch((error) => {
-        console.error("Error signing out: ", error);
+        window.location.href = "login.html"; 
       });
     });
   </script>
