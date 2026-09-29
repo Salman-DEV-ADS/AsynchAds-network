@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Sign Up - Ad Network</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f7f6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .signup-box {
+      background: white;
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      width: 300px;
+    }
+    h1 { text-align: center; color: #333; }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-sizing: border-box;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover { background-color: #218838; }
+    #message { color: red; text-align: center; margin-top: 10px; }
+    .link { text-align: center; margin-top: 15px; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <div class="signup-box">
+    <h1>Create Account</h1>
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Password (min 6 characters)">
+    <button id="signupBtn">Sign Up</button>
+    <p id="message"></p>
+    <p class="link"><a href="login.html">Already have an account? Login</a></p>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    // PASTE YOUR REAL FIREBASE CONFIG HERE (Same as login.html)
+    const firebaseConfig = {
+      apiKey: "AIzaSyALBt9hfwejVrpmAU2I2JY3h7puWT77tOo",
+      authDomain: "asynchads-network.firebaseapp.com",
+      projectId: "asynchads-network",
+      storageBucket: "asynchads-network.firebasestorage.app",
+      messagingSenderId: "871536301577",
+      appId: "1:871536301577:web:8d706774f71c48dcc30ad8"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    document.getElementById("signupBtn").addEventListener("click", function() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const message = document.getElementById("message");
+
+      createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          message.style.color = "green";
+          message.textContent = "Account created! You can now log in.";
+        })
+        .catch((error) => {
+          message.style.color = "red";
+          message.textContent = "Error: " + error.message;
+        });
+    });
+  </script>
+</body>
+</html>
