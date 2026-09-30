@@ -72,12 +72,13 @@
 
     let currentUser = null;
 
-    // Check if user is logged in
-    onAuthStateChanged(auth, (user) => {
+       onAuthStateChanged(auth, (user) => {
       if (user) {
         currentUser = user;
       } else {
-        window.location.href = "login.html";
+        // Not logged in. Send them to signup, but remember the campaign they wanted to buy
+        const params = window.location.search;
+        window.location.href = "signup.html" + params;
       }
     });
 

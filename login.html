@@ -79,9 +79,15 @@
                     message.style.color = "green";
           message.textContent = "Login successful! Redirecting...";
           
-          window.location.href = "dashboard.html";
-        })
-        .catch((error) => {
+          // If they came from a "Buy Now" flow, send them back to finish the order
+          const params = window.location.search;
+          if (params) {
+            window.location.href = "create-campaign.html" + params;
+          } else {
+            window.location.href = "dashboard.html";
+          }        })
+        
+          .catch((error) => {
           message.style.color = "red";
           message.textContent = "Error: " + error.message;
         });
