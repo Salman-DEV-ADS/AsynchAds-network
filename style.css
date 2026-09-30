@@ -1,17 +1,113 @@
+/* ==========================================
+   SHARED STYLES FOR THE ENTIRE PORTAL
+   ========================================== */
+
 body {
-    background-color: lightblue;
-    text-align: center;
-    font-family: Arial, sans-serif;
+  font-family: Arial, sans-serif;
+  background-color: #f4f7f6;
+  margin: 0;
 }
 
-h1 {
-     
-  color: darkblue;
-  font-size: 48px;
+/* ---- AUTH PAGES (Login / Signup) ---- */
+.auth-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
 }
 
+.auth-box {
+  background: white;
+  padding: 40px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  width: 300px;
+}
 
-p {
-  color: black;
-  font-size: 20px;
+.auth-box h1 {
+  text-align: center;
+  color: #333;
+}
+
+.auth-box input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+.auth-box button {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  color: white;
+}
+
+.btn-blue { background-color: #007bff; }
+.btn-blue:hover { background-color: #0056b3; }
+.btn-green { background-color: #28a745; }
+.btn-green:hover { background-color: #218838; }
+
+#message { text-align: center; margin-top: 10px; }
+.link { text-align: center; margin-top: 15px; font-size: 14px; }
+.link a { color: #007bff; }
+
+/* ---- NAVBAR ---- */
+.navbar {
+  background-color: #007bff;
+  color: white;
+  padding: 15px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.navbar.admin { background-color: #dc3545; }
+.navbar h2 { margin: 0; }
+.navbar a { color: white; text-decoration: none; margin-left: 20px; }
+
+/* ---- DASHBOARD ---- */
+.container { padding: 30px; max-width: 1000px; margin: auto; }
+.card {
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+}
+.logout-btn {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.campaign-item {
+  border: 1px solid #ddd;
+  padding: 15px;
+  margin-top: 10px;
+  border-radius: 5px;
+}
+.campaign-item h4 { margin: 0; color: #007bff; }
+.stats-table {
+  width: 100%;
+  margin-top: 10px;
+  text-align: center;
+  border-collapse: collapse;
+}
+.stats-table th { padding: 8px; background: #f4f7f6; }
+.stats-table td { padding: 8px; }
+.btn-delete {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
 }

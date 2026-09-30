@@ -2,30 +2,57 @@
 <html>
 <head>
   <title>Admin Panel - My Ad Network</title>
+  <link rel="stylesheet" href="style.css">
   <style>
-    body { font-family: Arial, sans-serif; background: #f4f7f6; margin: 0; }
-    .navbar { background-color: #dc3545; color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
-    .navbar h2 { margin: 0; }
-    .navbar a { color: white; text-decoration: none; margin-left: 20px; }
-    .container { padding: 30px; max-width: 1000px; margin: auto; }
-    .admin-card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); margin-bottom: 15px; border-left: 5px solid #007bff; }
+    /* Page-specific: admin card styles */
+    .admin-card {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      margin-bottom: 15px;
+      border-left: 5px solid #007bff;
+    }
     .admin-card h3 { margin: 0 0 10px 0; color: #007bff; }
     .meta { color: #555; font-size: 14px; margin: 5px 0; }
-    .metrics-row { display: flex; gap: 10px; margin-top: 15px; align-items: center; flex-wrap: wrap; }
-    .metrics-row input { padding: 8px; border: 1px solid #ccc; border-radius: 5px; width: 100px; }
-    .btn { padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; color: white; }
+    .metrics-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .metrics-row input {
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      width: 100px;
+    }
+    .btn {
+      padding: 8px 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      color: white;
+    }
     .btn-save { background-color: #28a745; }
     .btn-approve { background-color: #007bff; }
     .btn-pause { background-color: #ffc107; color: #333; }
     .btn-delete { background-color: #dc3545; }
-    .status-badge { padding: 3px 10px; border-radius: 3px; font-size: 12px; font-weight: bold; }
+    .status-badge {
+      padding: 3px 10px;
+      border-radius: 3px;
+      font-size: 12px;
+      font-weight: bold;
+    }
     .status-pending { background: #ffc107; color: #333; }
     .status-active { background: #28a745; color: white; }
     .status-paused { background: #6c757d; color: white; }
   </style>
 </head>
 <body>
-  <div class="navbar">
+  <div class="navbar admin">
     <h2>⚙️ Admin Panel</h2>
     <div>
       <a href="dashboard.html">Back to Dashboard</a>
@@ -40,39 +67,13 @@
   </div>
 
   <script type="module">
-    // 1. IMPORTS
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-    import { initializeAppCheck, ReCaptchaEnterpriseProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app-check.js";
+    import { auth, db } from "./firebase-config.js";
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { collection, getDocs, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    // 2. FIREBASE CONFIG (Paste your real keys)
-    const firebaseConfig = {
-     apiKey: "AIzaSyALBt9hfwejVrpmAU2I2JY3h7puWT77tOo",
-      authDomain: "asynchads-network.firebaseapp.com",
-      projectId: "asynchads-network",
-      storageBucket: "asynchads-network.firebasestorage.app",
-      messagingSenderId: "871536301577",
-      appId: "1:871536301577:web:8d706774f71c48dcc30ad8"
-    };
-
-    // 3. INITIALIZE APP FIRST
-    const app = initializeApp(firebaseConfig);
-
-    // 4. APP CHECK SECOND
-    const appCheck = initializeAppCheck(app, {
-      provider: new ReCaptchaEnterpriseProvider('6LeFJNctAAAAAJt3zj8Eg_MeUtNUnOiveMBEDuM1'),
-      isTokenAutoRefreshEnabled: true
-    });
-
-    // 5. THEN AUTH AND DB
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    // 6. ADMIN EMAIL - ONLY THIS EMAIL CAN ACCESS
+    // ⚠️ ONLY THIS EMAIL CAN ACCESS THE ADMIN PANEL
     const ADMIN_EMAIL = "asynchads.adops@gmail.com";
 
-    // 7. SECURITY CHECK
     onAuthStateChanged(auth, (user) => {
       if (!user) {
         window.location.href = "login.html";
@@ -84,19 +85,18 @@
       }
     });
 
-    // 8. LOAD ALL CAMPAIGNS
     async function loadAllCampaigns() {
       const list = document.getElementById("campaignList");
       try {
-        const querySnapshot = await getDocs(collection(db, "campaigns"));
+        const snapshot = await getDocs(collection(db, "campaigns"));
         list.innerHTML = "";
 
-        if (querySnapshot.empty) {
+        if (snapshot.empty) {
           list.innerHTML = "<p>No campaigns yet.</p>";
           return;
         }
 
-        querySnapshot.forEach((docSnap) => {
+        snapshot.forEach((docSnap) => {
           const data = docSnap.data();
           const id = docSnap.id;
 
@@ -130,7 +130,6 @@
       }
     }
 
-    // 9. SAVE METRICS
     window.saveMetrics = async function(id) {
       const impressions = Number(document.getElementById(`imp-${id}`).value);
       const clicks = Number(document.getElementById(`clk-${id}`).value);
@@ -138,9 +137,7 @@
 
       try {
         await updateDoc(doc(db, "campaigns", id), {
-          impressions: impressions,
-          clicks: clicks,
-          spend: spend
+          impressions, clicks, spend
         });
         alert("Stats saved!");
         loadAllCampaigns();
@@ -150,7 +147,6 @@
       }
     };
 
-    // 10. CHANGE STATUS
     window.changeStatus = async function(id, newStatus) {
       try {
         await updateDoc(doc(db, "campaigns", id), { status: newStatus });
@@ -161,7 +157,6 @@
       }
     };
 
-    // 11. DELETE CAMPAIGN
     window.deleteCampaign = async function(id) {
       if (!confirm("Delete this campaign permanently?")) return;
       try {
@@ -172,7 +167,6 @@
       }
     };
 
-    // 12. LOGOUT
     document.getElementById("logoutBtn").addEventListener("click", function(e) {
       e.preventDefault();
       signOut(auth).then(() => window.location.href = "login.html");

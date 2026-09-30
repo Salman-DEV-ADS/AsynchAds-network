@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Complete Payment - My Ad Network</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Page-specific: payment page styles */
+    .payment-container {
+      padding: 30px;
+      max-width: 600px;
+      margin: auto;
+    }
+    .payment-card {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .payment-card h1 {
+      color: #007bff;
+      margin-top: 0;
+    }
+    .amount {
+      font-size: 36px;
+      color: #28a745;
+      font-weight: bold;
+      display: block;
+      margin: 10px 0;
+    }
+    .instructions {
+      background: #f9f9f9;
+      padding: 20px;
+      border-radius: 5px;
+      margin: 20px 0;
+      border-left: 4px solid #007bff;
+    }
+    .instructions p {
+      margin: 8px 0;
+    }
+    .btn-goto-dashboard {
+      display: block;
+      text-align: center;
+      background: #28a745;
+      color: white;
+      padding: 15px;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+    .btn-goto-dashboard:hover {
+      background: #218838;
+    }
+    .note {
+      color: #666;
+      font-size: 14px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <h2>Complete Payment</h2>
+  </div>
+
+  <div class="payment-container">
+    <div class="payment-card">
+      <h1>Your campaign is reserved! 🎉</h1>
+      <p>To activate your campaign, please send the payment using one of the methods below.</p>
+
+      <div class="instructions">
+        <p><strong>Amount Due:</strong> <span class="amount">$250</span></p>
+        <p><strong>EasyPaisa / JazzCash:</strong> 0300-1234567 (Your Name)</p>
+        <p><strong>Bank Transfer:</strong> Meezan Bank, Acc # 1234567890 (Your Name)</p>
+      </div>
+
+      <p>After sending the payment, please email the screenshot/receipt to
+        <strong>salman@asynchads.com</strong> and include your campaign name in the subject line.</p>
+
+      <a href="dashboard.html" class="btn-goto-dashboard">
+        I have sent the payment → Go to Dashboard
+      </a>
+
+      <p class="note">
+        Your campaign will remain in "Pending Review" status until we confirm your payment.
+        Once confirmed, your ad will go live within 24 hours.
+      </p>
+    </div>
+  </div>
+</body>
+</html>
