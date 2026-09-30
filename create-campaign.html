@@ -70,6 +70,42 @@
     const auth = getAuth(app);
     const db = getFirestore(app); // Initialize the database
 
+        // ==========================================
+    // AUTO-FILL FORM FROM URL PARAMS
+    // ==========================================
+    function fillFormFromURL() {
+      const urlParams = new URLSearchParams(window.location.search);
+      
+      const name = urlParams.get('name');
+      const budget = urlParams.get('budget');
+      const category = urlParams.get('category');
+
+      console.log("URL Params found:", { name, budget, category });
+
+      if (name) {
+        const nameField = document.getElementById('campaignName');
+        if (nameField) nameField.value = decodeURIComponent(name);
+      }
+      if (budget) {
+        const budgetField = document.getElementById('budget');
+        if (budgetField) budgetField.value = budget;
+      }
+      if (category) {
+        const categoryField = document.getElementById('category');
+        if (categoryField) categoryField.value = category;
+      }
+    }
+
+    // Run the fill function as soon as the page is ready
+    document.addEventListener('DOMContentLoaded', fillFormFromURL);
+    // Also run it immediately in case DOMContentLoaded already fired
+    fillFormFromURL();
+       
+// Run the fill function as soon as the page is ready
+    document.addEventListener('DOMContentLoaded', fillFormFromURL);
+    // Also run it immediately in case DOMContentLoaded already fired
+    fillFormFromURL(); 
+
     let currentUser = null;
 
        onAuthStateChanged(auth, (user) => {
