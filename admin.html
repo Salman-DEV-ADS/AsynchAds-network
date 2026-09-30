@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Panel - Your Ad Network</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f4f7f6; margin: 0; }
+    .navbar { background-color: #dc3545; color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
+    .navbar h2 { margin: 0; }
+    .navbar a { color: white; text-decoration: none; margin-left: 20px; }
+    .container { padding: 30px; max-width: 1000px; margin: auto; }
+    .admin-card {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      margin-bottom: 15px;
+      border-left: 5px solid #007bff;
+    }
+    .admin-card h3 { margin: 0 0 10px 0; color: #007bff; }
+    .meta { color: #555; font-size: 14px; margin: 5px 0; }
+    .metrics-row { display: flex; gap: 10px; margin-top: 15px; align-items: center; flex-wrap: wrap; }
+    .metrics-row input {
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      width: 100px;
+    }
+    .btn {
+      padding: 8px 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      color: white;
+    }
+    .btn-save { background-color: #28a745; }
+    .btn-approve { background-color: #007bff; }
+    .btn-pause { background-color: #ffc107; color: #333; }
+    .btn-delete { background-color: #dc3545; }
+    .status-badge { padding: 3px 10px; border-radius: 3px; font-size: 12px; font-weight: bold; }
+    .status-pending { background: #ffc107; color: #333; }
+    .status-active { background: #28a745; color: white; }
+    .status-paused { background: #6c757d; color: white; }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <h2>⚙️ Admin Panel</h2>
+    <div>
+      <a href="dashboard.html">Back to Dashboard</a>
+      <a href="#" id="logoutBtn">Logout</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <h1>All Campaigns</h1>
+    <p>Review, approve, and update stats for every campaign in the network.</p>
+    <div id="campaignList">Loading...</div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    // ==========================================
+    // STEP 1: PUT YOUR REAL FIREBASE KEYS HERE
+    // ==========================================
+    const firebaseConfig = {
+       apiKey: "AIzaSyALBt9hfwejVrpmAU2I2JY3h7puWT77tOo",
+      authDomain: "asynchads-network.firebaseapp.com",
+      projectId: "asynchads-network",
+      storageBucket: "asynchads-network.firebasestorage.app",
+      messagingSenderId: "871536301577",
+      appId: "1:871536301577:web:8d706774f71c48dcc30ad8"
+    };
+
+    // ==========================================
+    // STEP 2: PUT YOUR ADMIN EMAIL HERE
+    // This is the email ONLY YOU will use to log in
+    // ==========================================
+    const ADMIN_EMAIL = "sardarsikandar982@gmail.com";
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // SECURITY CHECK: Only the admin can enter
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        window.location.href = "login.html";
+      } else if (user.email !== ADMIN_EMAIL) {
+        alert("Access denied. You are not an admin.");
+        window.location.href = "dashboard.html";
+      } else {
+        loadAllCampaigns();
+      }
+    });
+
+    // Fetch ALL campaigns from ALL users
+    async function loadAllCampaigns() {
+      const list = document.getElementById("campaignList");
+      try {
+        const querySnapshot = await getDocs(collection(db, "campaigns"));
+        list.innerHTML = "";
+
+        if (querySnapshot.empty) {
+          list.innerHTML = "<p>No campaigns yet.</p>";
+          return;
+        }
+
+        querySnapshot.forEach((docSnap) => {
+          const data = docSnap.data();
+          const id = docSnap.id;
+
+          list.innerHTML += `
+            <div class="admin-card">
+              <h3>${data.campaignName}</h3>
+              <p class="meta"><strong>Advertiser:</strong> ${data.userEmail}</p>
+              <p class="meta"><strong>Budget:</strong> $${data.budget} | <strong>Category:</strong> ${data.category}</p>
+              <p class="meta"><strong>Target Link:</strong> ${data.targetLink}</p>
+              <p class="meta">
+                <strong>Status:</strong> 
+                <span class="status-badge status-${(data.status || 'pending').toLowerCase().split(' ')[0]}">${data.status || 'Pending Review'}</span>
+              </p>
+              <p class="meta"><strong>Current Stats:</strong> Impressions: ${data.impressions || 0} | Clicks: ${data.clicks || 0} | Spend: $${data.spend || 0}</p>
+
+              <div class="metrics-row">
+                <input type="number" id="imp-${id}" placeholder="Impressions" value="${data.impressions || 0}">
+                <input type="number" id="clk-${id}" placeholder="Clicks" value="${data.clicks || 0}">
+                <input type="number" id="spd-${id}" placeholder="Spend $" value="${data.spend || 0}">
+                <button class="btn btn-save" onclick="saveMetrics('${id}')">Save Stats</button>
+                <button class="btn btn-approve" onclick="changeStatus('${id}', 'Active')">Approve</button>
+                <button class="btn btn-pause" onclick="changeStatus('${id}', 'Paused')">Pause</button>
+                <button class="btn btn-delete" onclick="deleteCampaign('${id}')">Delete</button>
+              </div>
+            </div>
+          `;
+        });
+      } catch (error) {
+        console.error("Error loading campaigns:", error);
+        list.innerHTML = "<p style='color:red;'>Error loading campaigns. Check console.</p>";
+      }
+    }
+
+    // Save metrics to Firestore
+    window.saveMetrics = async function(id) {
+      const impressions = Number(document.getElementById(`imp-${id}`).value);
+      const clicks = Number(document.getElementById(`clk-${id}`).value);
+      const spend = Number(document.getElementById(`spd-${id}`).value);
+
+      try {
+        await updateDoc(doc(db, "campaigns", id), {
+          impressions: impressions,
+          clicks: clicks,
+          spend: spend
+        });
+        alert("Stats saved!");
+        loadAllCampaigns();
+      } catch (error) {
+        console.error(error);
+        alert("Error saving stats.");
+      }
+    };
+
+    // Change campaign status
+    window.changeStatus = async function(id, newStatus) {
+      try {
+        await updateDoc(doc(db, "campaigns", id), { status: newStatus });
+        loadAllCampaigns();
+      } catch (error) {
+        console.error(error);
+        alert("Error updating status.");
+      }
+    };
+
+    // Delete a campaign
+    window.deleteCampaign = async function(id) {
+      if (!confirm("Delete this campaign permanently?")) return;
+      try {
+        await deleteDoc(doc(db, "campaigns", id));
+        loadAllCampaigns();
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    // Logout
+    document.getElementById("logoutBtn").addEventListener("click", function(e) {
+      e.preventDefault();
+      signOut(auth).then(() => window.location.href = "login.html");
+    });
+  </script>
+</body>
+</html>

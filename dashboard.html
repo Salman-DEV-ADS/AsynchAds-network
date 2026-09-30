@@ -93,15 +93,31 @@
         if (querySnapshot.empty) {
           list.innerHTML = "<p>No campaigns yet.</p>";
         } else {
-          querySnapshot.forEach((doc) => {
+                   querySnapshot.forEach((doc) => {
             const data = doc.data();
-                            list.innerHTML += `
-              <div style="border: 1px solid #ddd; padding: 15px; margin-top: 10px; border-radius: 5px; display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                  <h4 style="margin: 0; color: #007bff;">${data.campaignName}</h4>
-                  <p style="margin: 5px 0;">Budget: $${data.budget} | Status: ${data.status}</p>
-                </div>
-                <button onclick="deleteCampaign('${doc.id}')" style="background-color: #dc3545; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer;">Delete</button>
+            const impressions = data.impressions || 0;
+            const clicks = data.clicks || 0;
+            const spend = data.spend || 0;
+            const ctr = impressions > 0 ? ((clicks / impressions) * 100).toFixed(2) : "0.00";
+
+            list.innerHTML += `
+              <div style="border: 1px solid #ddd; padding: 15px; margin-top: 10px; border-radius: 5px;">
+                <h4 style="margin: 0; color: #007bff;">${data.campaignName}</h4>
+                <p style="margin: 5px 0;">Budget: $${data.budget} | Status: <strong>${data.status}</strong></p>
+                <table style="width:100%; margin-top: 10px; text-align: center; border-collapse: collapse;">
+                  <tr style="background: #f4f7f6;">
+                    <th style="padding: 8px;">Impressions</th>
+                    <th style="padding: 8px;">Clicks</th>
+                    <th style="padding: 8px;">CTR</th>
+                    <th style="padding: 8px;">Spend</th>
+                  </tr>
+                  <tr>
+                    <td style="padding: 8px;">${impressions.toLocaleString()}</td>
+                    <td style="padding: 8px;">${clicks.toLocaleString()}</td>
+                    <td style="padding: 8px;">${ctr}%</td>
+                    <td style="padding: 8px;">$${spend}</td>
+                  </tr>
+                </table>
               </div>
             `;
           });
