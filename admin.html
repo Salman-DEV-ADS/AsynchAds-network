@@ -81,8 +81,13 @@
     // ==========================================
     const ADMIN_EMAIL = "asynchads.adops@gmail.com";
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
+    import { initializeAppCheck, ReCaptchaEnterpriseProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app-check.js";
+
+    const appCheck = initializeAppCheck(app, {
+      provider: new ReCaptchaEnterpriseProvider('6LeFJNctAAAAAJt3zj8Eg_MeUtNUnOiveMBEDuM1'),
+      isTokenAutoRefreshEnabled: true
+    });
+        const auth = getAuth(app);
     const db = getFirestore(app);
 
     // SECURITY CHECK: Only the admin can enter
