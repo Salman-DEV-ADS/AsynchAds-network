@@ -129,12 +129,18 @@
           createdAt: new Date()
         });
 
-        message.style.color = "green";
-        message.textContent = "Campaign created successfully!";
+               message.style.color = "green";
+        message.textContent = "Campaign created successfully! Redirecting to payment...";
         document.getElementById("campaignForm").reset();
 
+        // Pass the budget and campaign name to the payment page
+        const paymentParams = new URLSearchParams({
+          amount: budget,
+          campaign: name
+        });
+
         setTimeout(() => {
-          window.location.href = "dashboard.html";
+          window.location.href = "payment.html?" + paymentParams.toString();
         }, 1500);
 
       } catch (error) {
