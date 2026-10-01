@@ -71,9 +71,10 @@
       <p>To activate your campaign, please send the payment using one of the methods below.</p>
 
       <div class="instructions">
-        <p><strong>Amount Due:</strong> <span class="amount">$250</span></p>
-        <p><strong>EasyPaisa / JazzCash:</strong> 0300-1234567 (Your Name)</p>
-        <p><strong>Bank Transfer:</strong> Meezan Bank, Acc # 1234567890 (Your Name)</p>
+        <p><strong>Amount Due:</strong> <span class="amount" id="amountDisplay">$0</span></p>
+<p><strong>Campaign:</strong> <span id="campaignDisplay">—</span></p>
+<p><strong>EasyPaisa / JazzCash:</strong> 03XX-XXXXXXX (YOUR REAL NAME)</p>
+<p><strong>Bank Transfer:</strong> YOUR BANK, Acc # YOUR ACCOUNT NUMBER (YOUR REAL NAME)</p>
       </div>
 
       <p>After sending the payment, please email the screenshot/receipt to
@@ -89,5 +90,21 @@
       </p>
     </div>
   </div>
+  <script>
+  // Read URL params
+  const params = new URLSearchParams(window.location.search);
+  const amount = params.get('amount');
+  const campaign = params.get('campaign');
+
+  if (amount) {
+    document.getElementById('amountDisplay').textContent = '$' + amount;
+  } else {
+    document.getElementById('amountDisplay').textContent = 'Contact us';
+  }
+
+  if (campaign) {
+    document.getElementById('campaignDisplay').textContent = campaign;
+  }
+</script>
 </body>
 </html>
